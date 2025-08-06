@@ -1,18 +1,25 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import { IoSearch } from "react-icons/io5";
-import { IoClose } from "react-icons/io5";
 
 type Props = {
-  onSearch: (page: number, query: string, type: string, year: string) => void;
-  scrolled: boolean;
+  query: string;
+  setQuery: (val: string) => void;
+  type: string;
+  setType: (val: string) => void;
+  year: string;
+  setYear: (val: string) => void;
+  onSearch: () => void;
 };
 
-const SearchBar = ({ onSearch, scrolled }: Props) => {
-  const [query, setQuery] = useState("");
-  const [type, setType] = useState("");
-  const [year, setYear] = useState("");
+const TopFilterBar = ({
+  query,
+  setQuery,
+  type,
+  setType,
+  year,
+  setYear,
+  onSearch,
+}: Props) => {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -26,21 +33,13 @@ const SearchBar = ({ onSearch, scrolled }: Props) => {
     const updated = [query.trim(), ...recentSearches.filter((q) => q !== query.trim())].slice(0, 5);
     setRecentSearches(updated);
     localStorage.setItem("recentSearches", JSON.stringify(updated));
-    onSearch(1, query.trim(), type, year);
+    onSearch();
     setShowDropdown(false);
   };
 
   const handleSelectRecent = (val: string) => {
     setQuery(val);
     setShowDropdown(false);
-  };
-
- 
-
-  const removeSearchItem = (itemToRemove: string) => {
-    const updated = recentSearches.filter((item) => item !== itemToRemove);
-    setRecentSearches(updated);
-    localStorage.setItem("recentSearches", JSON.stringify(updated));
   };
 
   return (
@@ -65,34 +64,16 @@ const SearchBar = ({ onSearch, scrolled }: Props) => {
 
           {/* Recent Searches Dropdown */}
           {showDropdown && recentSearches.length > 0 && (
-            <div
-              className={`absolute top-full left-0 w-full bg-[#1f1f1f] border border-gray-700 rounded-md mt-1 z-50 shadow-lg transition-all duration-300 ${
-                showDropdown ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
-              }`}
-            >
-              <div className="max-h-[180px] overflow-y-auto">
-                {recentSearches.map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
-                  >
-                    <button
-                      onClick={() => handleSelectRecent(item)}
-                      className="flex-grow text-left"
-                    >
-                      {item}
-                    </button>
-                    <button
-                      onClick={() => removeSearchItem(item)}
-                      className="ml-3 text-gray-400 hover:text-red-400 transition"
-                      title="Remove"
-                    >
-                      <IoClose className="text-lg" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            
+            <div className="absolute top-full left-0 w-full bg-[#1f1f1f] border border-gray-700 rounded-md mt-1 z-50 shadow-lg">
+              {recentSearches.map((item, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleSelectRecent(item)}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
+                >
+                  {item}
+                </button>
+              ))}
             </div>
           )}
         </div>
@@ -129,4 +110,4 @@ const SearchBar = ({ onSearch, scrolled }: Props) => {
   );
 };
 
-export default SearchBar;
+export default TopFilterBar;
