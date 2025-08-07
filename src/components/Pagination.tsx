@@ -28,73 +28,52 @@ const Pagination = ({ currentPage, totalResults, onPageChange }: Props) => {
   };
 
   return (
-    <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-4 mt-10 text-white">
-      {/* Prev */}
+    <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-3 mt-10 text-white">
+      {/* Previous Button */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded"
+        className="px-3 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 hover:brightness-110 disabled:opacity-30 disabled:cursor-not-allowed transition"
       >
         ◀
       </button>
 
-      {/* Page Buttons with Animation */}
+      {/* Page Buttons */}
       <AnimatePresence mode="popLayout">
         {generatePageNumbers().map((page, idx) => {
-          if (page === "left-jump") {
-            return (
-              <motion.button
-                key="left-jump"
-                onClick={() => onPageChange(Math.max(currentPage - 3, 1))}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="px-3 py-2 bg-gray-700 text-gray-200 hover:bg-gray-600 rounded"
-              >
-                ⇤
-              </motion.button>
+          const isJump = page === "left-jump" || page === "right-jump";
+          const jumpLabel = page === "left-jump" ? "⇤" : "⇥";
+          const handleJump = () =>
+            onPageChange(
+              page === "left-jump" ? Math.max(currentPage - 3, 1) : Math.min(currentPage + 3, totalPages)
             );
-          }
-
-          if (page === "right-jump") {
-            return (
-              <motion.button
-                key="right-jump"
-                onClick={() => onPageChange(Math.min(currentPage + 3, totalPages))}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="px-3 py-2 bg-gray-700 text-gray-200 hover:bg-gray-600 rounded"
-              >
-                ⇥
-              </motion.button>
-            );
-          }
 
           return (
             <motion.button
-              key={page}
-              onClick={() => onPageChange(Number(page))}
+              key={String(page)}
+              onClick={isJump ? handleJump : () => onPageChange(Number(page))}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              className={`px-3 py-2 rounded ${
-                currentPage === page
+              className={`px-3 py-2 rounded-full transition ${
+                isJump
+                  ? "bg-[#1f1f1f] text-gray-300 hover:bg-gray-700"
+                  : currentPage === page
                   ? "bg-white text-black font-bold"
-                  : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-              } transition`}
+                  : "bg-[#2a2a2a] text-gray-300 hover:bg-gray-700"
+              }`}
             >
-              {page}
+              {isJump ? jumpLabel : page}
             </motion.button>
           );
         })}
       </AnimatePresence>
 
-      {/* Next */}
+      {/* Next Button */}
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded"
+        className="px-3 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 hover:brightness-110 disabled:opacity-30 disabled:cursor-not-allowed transition"
       >
         ▶
       </button>

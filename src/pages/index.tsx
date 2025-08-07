@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { fetchMovies, fetchMovieById } from "@/utils/fetchMovies";
 import { Movie } from "@/types/movie";
-import { MovieDetail } from "@/types/movieDetail";
+import { MovieDetails } from "@/types/movieDetail";
 import MovieCard from "@/components/MovieCard";
 import Pagination from "@/components/Pagination";
 import MovieDetailModal from "@/components/MovieDetailModal";
@@ -16,7 +16,7 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
  
-  const [selectedMovie, setSelectedMovie] = useState<MovieDetail | null>(null);
+  const [selectedMovie, setSelectedMovie] = useState<MovieDetails | null>(null);
   const [showModal, setShowModal] = useState(false);
 const [scrolled, setScrolled] = useState(false);
 
@@ -44,7 +44,7 @@ useEffect(() => {
 
  const handleSearch = async (
   pageNumber = 1,
-  query = "batman",
+  query = "Action",
   type = "",
   year = ""
 ) => {
@@ -75,15 +75,16 @@ useEffect(() => {
     <main className="bg-gradient-to-br from-gray-900 via-black to-gray-800 min-h-screen text-white p-6">
       <div className="max-w-7xl mx-auto">
         {/* Title */}
-        <h1 className="text-4xl font-bold mb-10 text-center text-blue-500 drop-shadow-lg">
-          🎬 Movie Explorer
-        </h1>
+     <h1
+  className="text-4xl md:text-5xl font-extrabold text-center mb-10 bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-blue-500 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]"
+>
+  🎬 Movie Explorer
+</h1>
 
-        {/* Search & Filters */}
- <SearchBar
-  onSearch={handleSearch}
-  scrolled={scrolled}
-/>
+{/* Search & Filters */}
+ <div className="sticky top-0 z-50 mb-8 px-4 py-4 md:px-6 md:py-5 shadow-lg border-b border-white/10">
+  <SearchBar onSearch={handleSearch} scrolled={scrolled} />
+</div>
         {/* Loading/Error */}
     {loading && (
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

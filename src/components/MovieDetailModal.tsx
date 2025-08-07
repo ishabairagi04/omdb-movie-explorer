@@ -1,35 +1,70 @@
-import { MovieDetail } from "@/types/movieDetail";
+'use client';
+
+import { MovieDetails } from '@/types/movieDetail';
+import { IoClose } from 'react-icons/io5';
+import { useState } from 'react';
 
 type Props = {
-  movie: MovieDetail | null;
+  movie: MovieDetails;
   onClose: () => void;
 };
 
-const MovieDetailModal = ({ movie, onClose }: Props) => {
-  if (!movie) return null;
+const MovieDetailsModal = ({ movie, onClose }: Props) => {
+  const [showFullPlot, setShowFullPlot] = useState(false);
+  const isLongPlot = movie.Plot.length > 350;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-      <div className="bg-white w-[90%] max-w-2xl rounded-lg overflow-y-auto max-h-[90vh] shadow-lg relative">
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center px-4">
+      {/* Scrollable modal if content overflows */}
+      <div className="bg-gray-900 text-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 relative shadow-xl">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-600 hover:text-black text-xl font-bold"
+          className="absolute top-4 right-4 text-white text-2xl hover:text-red-400"
+          aria-label="Close modal"
         >
-          ✕
+          <IoClose />
         </button>
-        <div className="flex flex-col md:flex-row">
+
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Image grows with content */}
           <img
-            src={movie.Poster !== "N/A" ? movie.Poster : "/placeholder.jpg"}
+            src={movie.Poster !== 'N/A' ? movie.Poster : '/placeholder.jpg'}
             alt={movie.Title}
-            className="w-full md:w-1/3 object-cover rounded-l-lg"
+            className="w-full md:w-1/3 object-cover rounded-lg h-auto"
+            style={{ maxHeight: '100%' }}
           />
-          <div className="p-6 space-y-2">
-            <h2 className="text-2xl font-bold">{movie.Title}</h2>
-            <p className="text-gray-600 italic">{movie.Year} • {movie.Genre} • {movie.Runtime}</p>
-            <p className="text-sm text-gray-800 mt-2">{movie.Plot}</p>
-            <p><strong>Actors:</strong> {movie.Actors}</p>
-            <p><strong>Director:</strong> {movie.Director}</p>
-            <p><strong>IMDb Rating:</strong> ⭐ {movie.imdbRating}</p>
+
+          <div className="flex-1 space-y-3">
+            <h2 className="text-2xl font-bold text-pink-400">{movie.Title}</h2>
+
+            {/* Plot with Read More */}
+            <p className="text-sm text-gray-300 whitespace-pre-line">
+              {showFullPlot || !isLongPlot
+                ? movie.Plot
+                : `${movie.Plot.slice(0, 350)}...`}
+            </p>
+
+            {isLongPlot && (
+              <button
+                onClick={() => setShowFullPlot(!showFullPlot)}
+                className="text-blue-400 hover:text-blue-300 text-sm underline focus:outline-none"
+              >
+                {showFullPlot ? 'Show Less' : 'Read More'}
+              </button>
+            )}
+
+            <div className="text-sm text-gray-400 space-y-1">
+              <p><strong>Genre:</strong> {movie.Genre}</p>
+              <p><strong>Released:</strong> {movie.Released}</p>
+              <p><strong>Runtime:</strong> {movie.Runtime}</p>
+              <p><strong>Rated:</strong> {movie.Rated}</p>
+              <p><strong>Actors:</strong> {movie.Actors}</p>
+              <p><strong>Director:</strong> {movie.Director}</p>
+              <p><strong>Writer:</strong> {movie.Writer}</p>
+              <p><strong>IMDb:</strong> ⭐ {movie.imdbRating} ({movie.imdbVotes})</p>
+              <p><strong>Box Office:</strong> {movie.BoxOffice}</p>
+              <p><strong>Awards:</strong> {movie.Awards}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -37,4 +72,4 @@ const MovieDetailModal = ({ movie, onClose }: Props) => {
   );
 };
 
-export default MovieDetailModal;
+export default MovieDetailsModal;
