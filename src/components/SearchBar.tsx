@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { IoSearch, IoClose } from "react-icons/io5";
 import { FiFilter } from "react-icons/fi";
-import { Listbox } from "@headlessui/react";
-import { FaChevronDown } from "react-icons/fa";
+
 
 type Props = {
   onSearch: (page: number, query: string, type: string, year: string) => void;
