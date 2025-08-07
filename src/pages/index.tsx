@@ -57,11 +57,16 @@ useEffect(() => {
     setResults(data.Search || []);
     setTotalResults(Number(data.totalResults) || 0);
     setPage(pageNumber);
-  } catch (err: any) {
+} catch (err) {
+  if (err instanceof Error) {
     setError(err.message);
-    setResults([]);
-    setTotalResults(0);
-  } finally {
+  } else {
+    setError("An unexpected error occurred.");
+  }
+  setResults([]);
+  setTotalResults(0);
+}
+ finally {
     setLoading(false);
   }
 };
