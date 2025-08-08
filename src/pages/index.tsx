@@ -7,27 +7,55 @@ import MovieCard from "@/components/MovieCard";
 import Pagination from "@/components/Pagination";
 import MovieDetailModal from "@/components/MovieDetailModal";
 import SearchBar from "@/components/SearchBar";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
- 
   const [results, setResults] = useState<Movie[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
- 
+
   const [selectedMovie, setSelectedMovie] = useState<MovieDetails | null>(null);
   const [showModal, setShowModal] = useState(false);
-const [scrolled, setScrolled] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [query, setQuery] = useState("Action");
 
-useEffect(() => {
-  const handleScroll = () => {
-    setScrolled(window.scrollY > 10);
+  const router = useRouter();
+
+  const handleSearch = async (
+    pageNumber = 1,
+    searchQuery = "Action",
+    type = "",
+    year = ""
+  ) => {
+    if (!searchQuery.trim()) return;
+
+    try {
+      setLoading(true);
+      setError("");
+      setQuery(searchQuery);
+
+      const data = await fetchMovies(searchQuery, type, year, pageNumber);
+      setResults(data.Search || []);
+      setTotalResults(Number(data.totalResults) || 0);
+      setPage(pageNumber);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred.");
+      setResults([]);
+      setTotalResults(0);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  window.addEventListener("scroll", handleScroll);
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const openMovieModal = async (imdbID: string) => {
     try {
@@ -42,88 +70,79 @@ useEffect(() => {
     }
   };
 
- const handleSearch = async (
-  pageNumber = 1,
-  query = "Action",
-  type = "",
-  year = ""
-) => {
-  if (!query.trim()) return;
-
-  try {
-    setLoading(true);
-    setError("");
-    const data = await fetchMovies(query, type, year, pageNumber);
-    setResults(data.Search || []);
-    setTotalResults(Number(data.totalResults) || 0);
-    setPage(pageNumber);
-} catch (err) {
-  if (err instanceof Error) {
-    setError(err.message);
-  } else {
-    setError("An unexpected error occurred.");
-  }
-  setResults([]);
-  setTotalResults(0);
-}
- finally {
-    setLoading(false);
-  }
-};
-
-
   useEffect(() => {
     handleSearch();
   }, []);
 
   return (
     <main className="bg-gradient-to-br from-gray-900 via-black to-gray-800 min-h-screen text-white p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Title */}
-     <h1
-  className="text-4xl md:text-5xl font-extrabold text-center mb-10 bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-blue-500 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]"
->
-  🎬 Movie Explorer
-</h1>
+        {(query !== "Action" || page > 1) && (
+          <div className="">
+            <button
+              onClick={() => {
+                setQuery("Action");
+                setPage(1);
+                handleSearch(1, "Action");
+              }}
+              className="px-4 py-2 hover:bg-gray-700 rounded-md text-white text-sm font-medium transition"
+            >
+              ⬅ Back
+            </button>
+          </div>
+        )}
 
-{/* Search & Filters */}
- <div className="sticky top-0 z-50 mb-8 px-4 py-4 md:px-6 md:py-5 shadow-lg border-b border-white/10">
-  <SearchBar onSearch={handleSearch} scrolled={scrolled} />
-</div>
-        {/* Loading/Error */}
-    {loading && (
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    {[...Array(8)].map((_, idx) => (
-      <div
-        key={idx}
-        className="bg-gray-900 border border-gray-800 rounded-lg animate-pulse h-[350px]"
-      >
-        <div className="bg-gray-700 h-[270px] w-full" />
-        <div className="p-4 space-y-2">
-          <div className="h-4 bg-gray-700 rounded w-3/4"></div>
-          <div className="h-3 bg-gray-600 rounded w-1/2"></div>
+      <div className="max-w-7xl mx-auto">
+        {/* Back Button - only show when search or pagination is active */}
+      
+        {/* Title */}
+        <h1
+          className="text-4xl md:text-5xl font-extrabold text-center mb-10 bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-blue-500 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]"
+        >
+          🎬 Movie Explorer
+        </h1>
+
+        {/* Search & Filters */}
+        <div className="sticky top-0 z-50 mb-8 px-4 py-4 md:px-6 md:py-5 shadow-lg border-b border-white/10">
+          <SearchBar onSearch={handleSearch} scrolled={scrolled} />
         </div>
-      </div>
-    ))}
-  </div>
-)}
+
+        {/* Loading/Error */}
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, idx) => (
+              <div
+                key={idx}
+                className="bg-gray-900 border border-gray-800 rounded-lg animate-pulse h-[350px]"
+              >
+                <div className="bg-gray-700 h-[270px] w-full" />
+                <div className="p-4 space-y-2">
+                  <div className="h-4 bg-gray-700 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-600 rounded w-1/2"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {error && <p className="text-center text-red-500 font-semibold">{error}</p>}
 
         {/* Movie Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {results.map((movie) => (
-            <MovieCard key={movie.imdbID} movie={movie} onClick={() => openMovieModal(movie.imdbID)} />
+            <MovieCard
+              key={movie.imdbID}
+              movie={movie}
+              onClick={() => openMovieModal(movie.imdbID)}
+            />
           ))}
         </div>
 
         {/* Empty State */}
         {!loading && results.length === 0 && (
-      <div className="text-center text-gray-400 mt-10 space-y-2">
-  <p className="text-2xl">😢 No movies found</p>
-  <p className="text-sm">Try different keywords, year or type.</p>
-</div>
-
+          <div className="text-center text-gray-400 mt-10 space-y-2">
+            <p className="text-2xl">😢 No movies found</p>
+            <p className="text-sm">Try different keywords, year or type.</p>
+          </div>
         )}
 
         {/* Pagination */}
@@ -132,7 +151,7 @@ useEffect(() => {
             <Pagination
               currentPage={page}
               totalResults={totalResults}
-              onPageChange={(newPage) => handleSearch(newPage)}
+              onPageChange={(newPage) => handleSearch(newPage, query)}
             />
           </div>
         )}
