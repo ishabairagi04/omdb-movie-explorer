@@ -76,24 +76,24 @@ export default function Home() {
 
   return (
     <main className="bg-gradient-to-br from-gray-900 via-black to-gray-800 min-h-screen text-white p-6">
-        {(query !== "Action" || page > 1) && (
-          <div className="">
-            <button
-              onClick={() => {
-                setQuery("Action");
-                setPage(1);
-                handleSearch(1, "Action");
-              }}
-              className="px-4 py-2 hover:bg-gray-700 rounded-md text-white text-sm font-medium transition"
-            >
-              ⬅ Back
-            </button>
-          </div>
-        )}
+      {/* Fixed Back Button: top-right on mobile, top-left on sm+ */}
+      {(query !== "Action" || page > 1) && (
+        <button
+          onClick={() => {
+            setQuery("Action");
+            setPage(1);
+            handleSearch(1, "Action");
+          }}
+          aria-label="Back to home"
+          className="absolute
+           top-20 right-6 sm:left-6 sm:right-auto z-50 flex items-center gap-2 text-white hover:text-gray-300 transition focus:outline-none"
+        >
+          <span className="text-red-500 text-lg">⬅</span>
+          <span className="text-sm">Back</span>
+        </button>
+      )}
 
       <div className="max-w-7xl mx-auto">
-        {/* Back Button - only show when search or pagination is active */}
-      
         {/* Title */}
         <h1
           className="text-4xl md:text-5xl font-extrabold text-center mb-10 bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-blue-500 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]"
