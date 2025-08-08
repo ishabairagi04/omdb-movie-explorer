@@ -88,7 +88,7 @@ export default function Home() {
           className="absolute
            top-20 right-6 sm:left-6 sm:right-auto z-50 flex items-center gap-2 text-white hover:text-gray-300 transition focus:outline-none"
         >
-          <span className="text-red-500 text-lg">⬅</span>
+          <span className=" text-lg">⬅</span>
           <span className="text-sm">Back</span>
         </button>
       )}
